@@ -5,9 +5,7 @@ from django.views.generic import TemplateView
 from . import views
 
 urlpatterns = [
-    path(
-        "", TemplateView.as_view(template_name="main/index.html"), name="index"
-    ),
+    path("", TemplateView.as_view(template_name="main/index.html"), name="index"),
     path("home/", views.PostListView.as_view(), name="home"),
     path(
         "settings/",
@@ -19,9 +17,7 @@ urlpatterns = [
     path("signup/", views.SignUpView.as_view(), name="signup"),
     path(
         "signup_email_send/",
-        TemplateView.as_view(
-            template_name="registration/signup_email_send.html"
-        ),
+        TemplateView.as_view(template_name="registration/signup_email_send.html"),
         name="signup_email_send",
     ),
     path("activate/<token>/", views.ActivateView.as_view(), name="activate"),
@@ -45,4 +41,5 @@ urlpatterns = [
     ),
     path("search/", views.SearchView.as_view(), name="search"),
     path("like/<int:pk>", views.PostLikeAPIView.as_view(), name="like"),
+    path("comment/<int:post_pk>", views.CommentView.as_view(), name="comment"),
 ]

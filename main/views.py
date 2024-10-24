@@ -17,13 +17,14 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 from .forms import (
+    CommentForm,
     ConfirmForm,
     PostForm,
     ProfileEditForm,
     SearchForm,
     SignUpForm,
 )
-from .models import Post
+from .models import Comment, Post
 
 User = get_user_model()
 
@@ -37,8 +38,7 @@ class PostListView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset().select_related("user")
         if "follow" in self.request.GET:
             queryset = queryset.filter(
-                Q(user=self.request.user)
-                | Q(user__in=self.request.user.follow.all())
+                Q(user=self.request.user) | Q(user__in=self.request.user.follow.all())
             )
         return queryset
 
@@ -62,9 +62,7 @@ class SignUpView(CreateView):
             "user": user,
         }
         subject = "[BeEngram] アカウントを有効化してください"
-        message = render_to_string(
-            "registration/email/signup_message.txt", context
-        )
+        message = render_to_string("registration/email/signup_message.txt", context)
         user.email_user(subject, message)
         return HttpResponseRedirect(self.get_success_url())
 
@@ -130,11 +128,7 @@ class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
 
     def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .select_related("user")
-        )
+        return super().get_queryset().select_related("user")
 
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
@@ -171,9 +165,7 @@ class ProfileView(LoginRequiredMixin, FollowMixin, DetailView):
             )
         )
         if self.kwargs["pk"] != self.request.user.pk:
-            follow_list = self.request.user.follow.all().values_list(
-                "id", flat=True
-            )
+            follow_list = self.request.user.follow.all().values_list("id", flat=True)
             queryset = queryset.annotate(
                 is_follow=Case(
                     When(id__in=follow_list, then=True),
@@ -194,9 +186,7 @@ class FollowListView(LoginRequiredMixin, FollowMixin, ListView):
             queryset = user.followed
         else:
             queryset = user.follow
-        follow_list = self.request.user.follow.all().values_list(
-            "id", flat=True
-        )
+        follow_list = self.request.user.follow.all().values_list("id", flat=True)
         self.queryset = queryset.annotate(
             is_follow=Case(
                 When(id__in=follow_list, then=True),
@@ -238,9 +228,7 @@ class SearchView(LoginRequiredMixin, FollowMixin, ListView):
         return queryset.order_by("-post_date")
 
     def _search_users(self, keyword):
-        follow_list = self.request.user.follow.all().values_list(
-            "id", flat=True
-        )
+        follow_list = self.request.user.follow.all().values_list("id", flat=True)
         queryset = User.objects.all().annotate(
             is_follow=Case(
                 When(id__in=follow_list, then=True),
@@ -273,3 +261,14 @@ class PostLikeAPIView(LoginRequiredMixin, View):
         except Post.DoesNotExist:
             result = "DoesNotExist"
         return JsonResponse({"result": result})
+
+
+class CommentView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    success_url = reverse_lazy("home")
+
+    def get_form_kwargs(self):
+        post = get_object_or_404(Post, pk=self.kwargs["post_pk"])
+        self.object = self.model(user=self.request.user, post=post)
+        return super().get_form_kwargs()

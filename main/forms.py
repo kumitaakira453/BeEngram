@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Post, User
+from .models import Comment, Post, User
 
 
 class SignUpForm(UserCreationForm):
@@ -38,9 +38,7 @@ class ProfileEditForm(forms.ModelForm):
                     "data-form-image": True,
                 }
             ),
-            "profile": forms.Textarea(
-                attrs={"placeholder": "150字以内", "rows": 7}
-            ),
+            "profile": forms.Textarea(attrs={"placeholder": "150字以内", "rows": 7}),
         }
 
 
@@ -54,3 +52,14 @@ class SearchForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={"placeholder": "検索"}),
     )
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ("text",)
+        widgets = {
+            "text": forms.Textarea(
+                attrs={"placeholder": "コメント（150字以内）", "rows": 7}
+            )
+        }
