@@ -8,7 +8,9 @@
     --orange: #ff5c33;
 }
 
-*, ::after, ::before {
+*,
+::after,
+::before {
     box-sizing: border-box;
 }
 
@@ -59,11 +61,11 @@ body {
     margin: auto;
 }
 
-#header ~ #content {
+#header~#content {
     padding: 64px 0;
 }
 
-.header-tabs ~ #content {
+.header-tabs~#content {
     padding: 88px 0 !important;
 }
 
@@ -389,7 +391,7 @@ body {
     justify-content: center;
 }
 
-.profile__row > * {
+.profile__row>* {
     flex: 1;
 }
 
@@ -448,11 +450,17 @@ a.profile-counter {
     padding: 0;
     margin: 0;
     list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
 }
 
 .post-grid__item {
     display: block;
     padding: 4px;
+    flex: 0 0 auto;
+    width: calc(100% / 3);
 }
 
 .post-grid__item img {
