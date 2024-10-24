@@ -50,7 +50,11 @@
             </div>
             <div class="post__actions">
                 <div class="post__like">
-                    <a class="like{% if post in user.like.all %} like--active{% endif %}" data-pk="{{post.pk}}"><i class="fas fa-heart"></i></a>
+                    <a class="like{% if post in user.like.all %} like--active{% endif %}" data-pk="{{post.pk}}"><i
+                            class="fas fa-heart"></i></a>
+                </div>
+                <div class="post__comment">
+                    <a href="{% url 'comment' post.pk %}" class="comment"><i class="fas fa-comment"></i></a>
                 </div>
                 <div class="post__user">
                     <a href="{% url 'profile' post.user.pk %}" class="user">
@@ -84,7 +88,8 @@
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="target" value="{{ user.pk }}">
-            <button type="submit" name="{% if user.is_follow %}un{% endif %}follow" class="round-button round-button--narrow">フォロー{% if user.is_follow %}中{% endif %}</button>
+            <button type="submit" name="{% if user.is_follow %}un{% endif %}follow"
+                class="round-button round-button--narrow">フォロー{% if user.is_follow %}中{% endif %}</button>
         </form>
         {% endif %}
     </li>
